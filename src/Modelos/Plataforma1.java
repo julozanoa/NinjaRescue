@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Vista;
+package Modelos;
 
 /**
  *
  * @author usuario1
  */
-public class Ninja {
+public class Plataforma1 {
     
 }

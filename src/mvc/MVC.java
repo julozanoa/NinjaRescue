@@ -5,13 +5,16 @@
  */
 package mvc;
 
-import controlador.Controlador1;
-import controlador.Singleton;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import vista.Escena1;
-import vista.Vista;
+import Vista.Escena1;
+import Vista.Vista;
 
 /**
  *
@@ -28,6 +31,19 @@ public class MVC extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Pane layout  = new Pane();  
+        Canvas canvas = new Canvas(1024,576);
+        layout.getChildren().add(canvas);
+        Scene escena = new Scene(layout,1024,576, Color.WHITESMOKE);
+        
+        GraphicsContext lapiz = canvas.getGraphicsContext2D();
+        Escena1 juego = new Escena1(escena, lapiz);
+        juego.start();
+        
+        primaryStage.setScene(escena);
+        primaryStage.setTitle("Ejemplo Escenario Interactivo");
+        primaryStage.show();
+        
     }
     
 }
