@@ -41,7 +41,7 @@ public class MVC extends Application{
         juego.start();
         
         primaryStage.setScene(escena);
-        primaryStage.setTitle("Ejemplo Escenario Interactivo");
+        primaryStage.setTitle("Nivel 1 - Tutorial");
         primaryStage.show();
         
     }

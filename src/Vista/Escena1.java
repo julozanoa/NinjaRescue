@@ -36,34 +36,29 @@ public class Escena1 extends AnimationTimer{
     private boolean UpIsPress = false;
     private boolean seMueveDerecha = false;
     private boolean seMueveIzquierda = false;
-    private ArrayList<Pixel> pixelesSuperioresNinja;
-    private ArrayList<Pixel> pixelesInferioresNinja;
-    private ArrayList<Pixel> pixelesLateralesINinja;
-    private ArrayList<Pixel> pixelesLateralesDNinja;
-    private ArrayList<Pixel> pixelesSuperioresPlataformas;
-    private ArrayList<Pixel> pixelesInferioresPlataformas;
-    private ArrayList<Pixel> pixelesLateralesIParedes;
-    private ArrayList<Pixel> pixelesLateralesDParedes;
     private ArrayList<String> pulsacionTeclado = null;
-    private boolean gravedad = true;
+    private boolean gravedad;
+    private boolean saltando;
+    private boolean chocandoI;
+    private boolean chocandoD;
+    private int contadorSalto = 0;
+    private ArrayList<Shape> superficies;
+    private ArrayList<Shape> techos;
+    private ArrayList<Shape> lateralesIzq;
+    private ArrayList<Shape> lateralesDer;
     
     public Escena1(Scene escena, GraphicsContext lapiz) {
         this.lapiz = lapiz;
         this.escena = escena;
-        this.ninja = new Ninja(0, 400, 40, 60);
+        this.ninja = new Ninja(0,0, 40, 60);
         this.fondo = new Image( "Imagenes/fondojuego.png" );
         this.pisosprite = new Image( "Imagenes/Plataforma2.png" );
         this.ninjasprite = new Image( "Imagenes/Ninja(0).png" );
-        pixelesSuperioresNinja = new ArrayList<>();
-        pixelesInferioresNinja = new ArrayList<>();
-        pixelesLateralesINinja = new ArrayList<>();
-        pixelesLateralesDNinja = new ArrayList<>();
-        pixelesSuperioresPlataformas = new ArrayList<>();
-        pixelesInferioresPlataformas = new ArrayList<>();
-        pixelesLateralesIParedes = new ArrayList<>();
-        pixelesLateralesDParedes = new ArrayList<>();
+        superficies = new ArrayList<>();
+        techos = new ArrayList<>();
+        lateralesIzq = new ArrayList<>();
+        lateralesDer = new ArrayList<>();
         pulsacionTeclado = new ArrayList<>();
-                
         escena.setOnKeyPressed(new EventHandler<KeyEvent>(){
                 public void handle(KeyEvent e){
                     String code = e.getCode().toString();
@@ -88,74 +83,101 @@ public class Escena1 extends AnimationTimer{
         
         //Dibujando sprite del ninja
         lapiz.drawImage(ninjasprite,ninja.getXref(),ninja.getYref());
-        //registrando los bordes del ninja
-        for (int i = 0; i < ninja.getAncho(); i++) {
-            Pixel pixUp = new Pixel(ninja.getXref()+i,ninja.getYref());
-            pixelesSuperioresNinja.add(pixUp);
-            Pixel pixDwn = new Pixel((ninja.getXref()+i),(ninja.getYref()+ninja.getAlto()));
-            pixelesInferioresNinja.add(pixDwn);
-        }
-        for (int i = 0; i < ninja.getAlto(); i++) {
-            Pixel pixDer = new Pixel(ninja.getXref(),ninja.getYref()+i);
-            pixelesLateralesDNinja.add(pixDer);
-            Pixel pixIzq = new Pixel((ninja.getXref()+ninja.getAncho()),(ninja.getYref()+i));
-            pixelesLateralesINinja.add(pixIzq);
-        }
         //creando la hitbox del ninja
         Shape sNinja = new Rectangle(ninja.getXref()+10, ninja.getYref(), ninja.getAncho()-20, ninja.getAlto());
+        Shape sNinjaPiso = new Rectangle(ninja.getXref()+10,ninja.getYref()+58,20,3);
+        Shape sNinjaLateralI = new Rectangle(ninja.getXref()-1,ninja.getYref(),40,60);
+        Shape sNinjaLateralD = new Rectangle(ninja.getXref()+1,ninja.getYref(),40,60);
+        Shape sNinjaTecho = new Rectangle(ninja.getXref(),ninja.getYref()-1,40,3);
         
         
         //creando piso y registrando los pixeles
         int x = 0;
-        lapiz.drawImage(pisosprite,0, 100);
-        for (int i = 0; i < 40; i++) {
-            Pixel p = new Pixel(0+i,100);
-            pixelesSuperioresPlataformas.add(p);
-        }
+        lapiz.drawImage(pisosprite,100, 425);
+              //techo
+               Shape s1t = new Rectangle(100,424,40,3);
+               Shape intrs = SVGPath.intersect(sNinjaPiso, s1t);
+               superficies.add(intrs);
+               //ladoDer
+               Shape s1ld = new Rectangle(121,426,20,40);
+               Shape intrsd = SVGPath.intersect(sNinjaLateralI, s1ld);
+               lateralesIzq.add(intrsd);
+               //ladoIzq
+               Shape s1li = new Rectangle(99,426,20,40);
+               Shape intrsi = SVGPath.intersect(sNinjaLateralD, s1li);
+               lateralesDer.add(intrsi);
+               //piso
+               Shape s1lp = new Rectangle(100,426,40,40);
+               Shape intrsp = SVGPath.intersect(sNinjaTecho, s1lp);
+               techos.add(intrsp);
+
         for (int i = 0; i < 26; i++) {
             if (x != 200 && x != 240) {
-               lapiz.drawImage(pisosprite,x,536);
-               for (int j = 0; j < 40; j++) {
-                   Pixel pixSupP =  new Pixel(x+j,536);
-                   pixelesSuperioresPlataformas.add(pixSupP);
-                   
-                   Pixel pixLatIP = new Pixel(x,536+j);
-                   pixelesLateralesIParedes.add(pixLatIP);
-                   
-                   Pixel pixLatDP = new Pixel(x+40,536+j);
-                   pixelesLateralesDParedes.add(pixLatDP);
-               }
+               lapiz.drawImage(pisosprite,x,535);
+               Shape s = new Rectangle(x,534,40,3);
+               Shape intr = SVGPath.intersect(sNinjaPiso,s);
+               superficies.add(intr);
             }
             x+=40;
         }
-
         //Validando si el ninja esta en el piso
-        for (int i = 0; i < pixelesInferioresNinja.size(); i++) {
-            for (int j = 0; j < pixelesSuperioresPlataformas.size(); j++) {
-                if (pixelesInferioresNinja.get(i).getxRef() == pixelesSuperioresPlataformas.get(j).getxRef()) {
-                    if (pixelesInferioresNinja.get(i).getyRef()+1 == pixelesSuperioresPlataformas.get(j).getyRef()) {
-                        this.gravedad = false;
-                        System.out.println("1");
-                    }
-                }
+        for (int i = 0; i < superficies.size(); i++) {
+            if ((superficies.get(i).getBoundsInLocal().getWidth()) != -1) {
+                gravedad = false;
+            }
+        }
+        
+        //Validando si esta chocando por izquierda
+        for (int i = 0; i < lateralesIzq.size(); i++) {
+            if ((lateralesIzq.get(i).getBoundsInLocal().getWidth()) != -1) {
+                chocandoI = true;
+            }
+        }
+        for (int i = 0; i < lateralesDer.size(); i++) {
+            if ((lateralesDer.get(i).getBoundsInLocal().getWidth()) != -1) {
+                chocandoD = true;
             }
         }
         
         
-        
-        if (this.gravedad) {
+        if (pulsacionTeclado.contains("UP")&&!gravedad) {
+            contadorSalto = 20;
+            saltando = true;
+        }
+        if (saltando && contadorSalto <= 20) {
+            for (int i = 0; i < techos.size(); i++) {
+                if ((techos.get(i).getBoundsInLocal().getWidth()) != -1) {
+                
+                }else{
+                ninja.moverArriba();
+                ninja.moverArriba();
+                ninja.moverArriba();
+                ninja.moverArriba();
+                }
+            }
+                contadorSalto--;
+            }
+        if (contadorSalto == 0) {
+            saltando = false;
+        }
+        if (gravedad && !saltando) {
+            ninja.moverAbajo();
+            ninja.moverAbajo();
             ninja.moverAbajo();
             ninja.moverAbajo();
         }
-        
-        if (pulsacionTeclado.contains("LEFT")){
+        if (pulsacionTeclado.contains("LEFT") && !chocandoI){
+            ninja.moverIzquierda();
+            ninja.moverIzquierda();
             ninja.moverIzquierda();
             this.seMueveIzquierda = true;
-        }if (pulsacionTeclado.contains("RIGHT")){
+        }if (pulsacionTeclado.contains("RIGHT") && !chocandoD){
+            ninja.moverDerecha();
+            ninja.moverDerecha();
             ninja.moverDerecha();
             this.seMueveDerecha = true;
         }
-        
+
         if(this.numero % 9 == 0  && this.seMueveDerecha ){
                 if(this.secuencia == 9){
                   this.secuencia = 0;
@@ -217,15 +239,14 @@ public class Escena1 extends AnimationTimer{
                 }
           }
         
-        pixelesSuperioresNinja = new ArrayList<>();
-        pixelesInferioresNinja = new ArrayList<>();
-        pixelesLateralesINinja = new ArrayList<>();
-        pixelesLateralesDNinja = new ArrayList<>();
-        pixelesSuperioresPlataformas = new ArrayList<>();
-        pixelesInferioresPlataformas = new ArrayList<>();
-        pixelesLateralesIParedes = new ArrayList<>();
-        pixelesLateralesDParedes = new ArrayList<>();
+
         this.gravedad = true;
+        this.chocandoI = false;
+        this.chocandoD = false;
+        superficies = new ArrayList<>();
+        techos = new ArrayList<>();
+        lateralesIzq = new ArrayList<>();
+        lateralesDer = new ArrayList<>();
     }
     
 }
