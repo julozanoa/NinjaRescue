@@ -33,16 +33,19 @@ public class Escena1 extends AnimationTimer{
     private Image pisosprite;
     private Image obstaculo1;
     private Image obstaculo2;
+    private Image fuego;
     private int secuencia = 0;
+    private int secuenciaF = 0;
     private int numero ;
     private boolean UpIsPress = false;
     private boolean seMueveDerecha = false;
     private boolean seMueveIzquierda = false;
-    private ArrayList<String> pulsacionTeclado = null;
     private boolean gravedad;
     private boolean saltando;
     private boolean chocandoI;
     private boolean chocandoD;
+    private boolean chocandoTecho;
+    private ArrayList<String> pulsacionTeclado = null;
     private int contadorSalto = 0;
     private ArrayList<Shape> superficies;
     private ArrayList<Shape> techos;
@@ -53,12 +56,13 @@ public class Escena1 extends AnimationTimer{
     public Escena1(Scene escena, GraphicsContext lapiz) {
         this.lapiz = lapiz;
         this.escena = escena;
-        this.ninja = new Ninja(0,475, 40, 60);
+        this.ninja = new Ninja(800,475, 40, 60);
         this.fondo = new Image( "Imagenes/fondojuego2.png" );
         this.pisosprite = new Image( "Imagenes/Plataforma1.png" );
         this.ninjasprite = new Image( "Imagenes/Ninja(0).png" );
         this.obstaculo1 = new Image( "Imagenes/Obstaculo1.png" );
         this.obstaculo2 = new Image( "Imagenes/Obstaculo3.png" );
+        this.fuego = new Image( "Imagenes/fuego0.png" );
         superficies = new ArrayList<>();
         techos = new ArrayList<>();
         lateralesIzq = new ArrayList<>();
@@ -102,14 +106,38 @@ public class Escena1 extends AnimationTimer{
 
 
                //piso
-               Shape s1lp = new Rectangle(100,426,40,40);
-               Shape intrsp = SVGPath.intersect(sNinjaTecho, s1lp);
-               techos.add(intrsp);
+               
         int x1 = 0;
+        int y1 = 0;
+        lapiz.drawImage(obstaculo1,532,420);
+        Shape techoBi = new Rectangle(532,419,40,4);
+        Shape intrsPbi = SVGPath.intersect(sNinjaPiso, techoBi);
+        superficies.add(intrsPbi);
+        Shape lateralBiD = new Rectangle(568,420,4,40);
+        Shape intrsBiD = SVGPath.intersect(sNinjaLateralI, lateralBiD);
+        lateralesIzq.add(intrsBiD);
+        Shape lateralBiI = new Rectangle(532,420,4,40);
+        Shape intrsBiI = SVGPath.intersect(sNinjaLateralI, lateralBiI);
+        lateralesDer.add(intrsBiI);
+        //fuego
+        for (int i = 0; i < 7; i++) {
+            lapiz.drawImage(fuego,y1+442,546);
+            Shape fuego = new Rectangle(y1+442,546,30,30);
+            Shape obsFuego = SVGPath.intersect(sNinja, fuego);
+            obstaculos.add(obsFuego);
+            y1 += 30;
+        }
+        //piso inicio
         for (int i = 0; i < 4; i++) {
+            
             lapiz.drawImage(pisosprite,x1, 536);
             lapiz.drawImage(pisosprite,x1+280, 536);
-            //techo 
+            //piso de la puerta
+            lapiz.drawImage(pisosprite,x1,80);
+               Shape s1lT = new Rectangle(x1,121,40,4);
+               Shape intrsp = SVGPath.intersect(sNinjaTecho, s1lT);
+               techos.add(intrsp);
+            //plataformas
                Shape techo = new Rectangle(x1,535,40,4);
                Shape intrsP = SVGPath.intersect(sNinjaPiso, techo);
                superficies.add(intrsP);
@@ -120,12 +148,18 @@ public class Escena1 extends AnimationTimer{
                Shape lateralD = new Rectangle(x1+37,536,4,40);
                Shape intrsD = SVGPath.intersect(sNinjaLateralI, lateralD);
                lateralesIzq.add(intrsD);
+               Shape lateralDp = new Rectangle(x1+37,80,4,40);
+               Shape intrsDp = SVGPath.intersect(sNinjaLateralI, lateralDp);
+               lateralesIzq.add(intrsDp);
+               
             }
             if (x1+280 == 280) {
                Shape lateralI = new Rectangle(x1+279,536,4,40);
                Shape intrsI = SVGPath.intersect(sNinjaLateralD, lateralI);
                lateralesDer.add(intrsI);
             }
+            //barril inermedio
+            
             if (x1+280 == 400) {
                lapiz.drawImage(obstaculo1,x1+280,496);
                Shape techoB = new Rectangle(x1+280,495,40,4);
@@ -149,6 +183,14 @@ public class Escena1 extends AnimationTimer{
         }
         for (int i = 0; i < 9; i++) {
             lapiz.drawImage(pisosprite,x1+504, 536);
+            Shape techo = new Rectangle(x1+504,535,40,4);
+               Shape intrsP = SVGPath.intersect(sNinjaPiso, techo);
+               superficies.add(intrsP);
+            //piso llave
+            lapiz.drawImage(pisosprite,x1+504, 80);
+            Shape s1lT = new Rectangle(x1+504,121,40,4);
+               Shape intrsp = SVGPath.intersect(sNinjaTecho, s1lT);
+               techos.add(intrsp);
             if (i == 0) {
                lapiz.drawImage(obstaculo1,x1+504,496);
                Shape techoB = new Rectangle(x1+504,495,40,4);
@@ -157,6 +199,12 @@ public class Escena1 extends AnimationTimer{
                Shape lateralIB = new Rectangle(x1+509,497,4,40);
                Shape intrsIB = SVGPath.intersect(sNinjaLateralD, lateralIB);
                lateralesDer.add(intrsIB);
+            }
+            if (i == 1) {
+               lapiz.drawImage(obstaculo2,x1+504,514);
+               Shape obs = new Rectangle(x1+504,514,40,22);
+               Shape intrsObs = SVGPath.intersect(sNinja, obs);
+               obstaculos.add(intrsObs);
             }
             x1 += 40;
         }
@@ -187,29 +235,33 @@ public class Escena1 extends AnimationTimer{
                 break;
             }
         }
-        
+        for (int i = 0; i < techos.size(); i++) {
+            if ((techos.get(i).getBoundsInLocal().getWidth()) != -1) {
+                chocandoTecho = true;
+            }
+        }
         if (pulsacionTeclado.contains("UP")&&!gravedad) {
             contadorSalto = 20;
             saltando = true;
         }
+        System.out.println(this.chocandoTecho);
+        System.out.println(this.gravedad);
+        System.out.println(this.saltando);
         if (saltando && contadorSalto <= 20) {
-            for (int i = 0; i < techos.size(); i++) {
-                if ((techos.get(i).getBoundsInLocal().getWidth()) != -1) {
-                
-                }else{
+            if (!chocandoTecho) {
                 ninja.moverArriba();
                 ninja.moverArriba();
                 ninja.moverArriba();
                 ninja.moverArriba();
                 ninja.moverArriba();
                 ninja.moverArriba();
-                }
+                ninja.moverArriba();
             }
                 contadorSalto--;
-            }
-        if (contadorSalto == 0) {
+                if (contadorSalto == 0) {
             saltando = false;
         }
+            }
         if (gravedad && !saltando) {
             ninja.moverAbajo();
             ninja.moverAbajo();
@@ -259,7 +311,8 @@ public class Escena1 extends AnimationTimer{
                   this.seMueveDerecha = false;
                 }
           }
-        if(this.numero % 9 == 0  && this.seMueveIzquierda ){
+        
+        if(this.numero % 9 == 0 && this.seMueveIzquierda){
                 if(this.secuencia == 9){
                   this.secuencia = 0;
                 }else{
@@ -290,6 +343,27 @@ public class Escena1 extends AnimationTimer{
                 }
           }
         
+        if(this.numero % 10 == 0){
+                if(this.secuenciaF == 10){
+                  this.secuenciaF = 0;
+                }else{
+                    if (this.secuenciaF == 0 || this.secuenciaF == 1) {
+                        this.fuego = new Image( "Imagenes/fuego0.png" ); 
+                    }else if (this.secuenciaF == 2 || this.secuenciaF == 3) {
+                        this.fuego = new Image( "Imagenes/fuego1.png" ); 
+                    }else if (this.secuenciaF == 4 || this.secuenciaF == 5) {
+                        this.fuego = new Image( "Imagenes/fuego2.png" ); 
+                    }else if (this.secuenciaF == 5 || this.secuenciaF == 6) {
+                        this.fuego = new Image( "Imagenes/fuego3.png" ); 
+                    }else if (this.secuenciaF == 7 || this.secuenciaF == 8) {
+                        this.fuego = new Image( "Imagenes/fuego4.png" ); 
+                    }else if (this.secuenciaF == 9 || this.secuenciaF == 10) {
+                        this.fuego = new Image( "Imagenes/fuego5.png" ); 
+                    }
+                    
+                  this.secuenciaF++;
+                }
+          }
 
         
         
@@ -297,6 +371,7 @@ public class Escena1 extends AnimationTimer{
         this.gravedad = true;
         this.chocandoI = false;
         this.chocandoD = false;
+        this.chocandoTecho = false;
         superficies = new ArrayList<>();
         techos = new ArrayList<>();
         lateralesIzq = new ArrayList<>();
