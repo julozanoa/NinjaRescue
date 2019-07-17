@@ -343,21 +343,21 @@ public class Escena1 extends AnimationTimer{
                 }
           }
         
-        if(this.numero % 10 == 0){
-                if(this.secuenciaF == 10){
+        if(this.numero % 17 == 0){
+                if(this.secuenciaF == 17){
                   this.secuenciaF = 0;
                 }else{
-                    if (this.secuenciaF == 0 || this.secuenciaF == 1) {
+                    if (this.secuenciaF == 0 || this.secuenciaF == 1 || this.secuenciaF == 2) {
                         this.fuego = new Image( "Imagenes/fuego0.png" ); 
-                    }else if (this.secuenciaF == 2 || this.secuenciaF == 3) {
+                    }else if (this.secuenciaF == 3 || this.secuenciaF == 4 || this.secuenciaF == 5) {
                         this.fuego = new Image( "Imagenes/fuego1.png" ); 
-                    }else if (this.secuenciaF == 4 || this.secuenciaF == 5) {
+                    }else if (this.secuenciaF == 6 || this.secuenciaF == 7 || this.secuenciaF == 8) {
                         this.fuego = new Image( "Imagenes/fuego2.png" ); 
-                    }else if (this.secuenciaF == 5 || this.secuenciaF == 6) {
+                    }else if (this.secuenciaF == 9 || this.secuenciaF == 10 || this.secuenciaF == 11) {
                         this.fuego = new Image( "Imagenes/fuego3.png" ); 
-                    }else if (this.secuenciaF == 7 || this.secuenciaF == 8) {
+                    }else if (this.secuenciaF == 12 || this.secuenciaF == 13 || this.secuenciaF == 14) {
                         this.fuego = new Image( "Imagenes/fuego4.png" ); 
-                    }else if (this.secuenciaF == 9 || this.secuenciaF == 10) {
+                    }else if (this.secuenciaF == 15 || this.secuenciaF == 16 || this.secuenciaF == 17) {
                         this.fuego = new Image( "Imagenes/fuego5.png" ); 
                     }
                     
