@@ -30,6 +30,14 @@ public class Ninja {
         return yref;
     }
 
+    public void setXref(int xref) {
+        this.xref = xref;
+    }
+
+    public void setYref(int yref) {
+        this.yref = yref;
+    }
+
     public int getAncho() {
         return ancho;
     }
