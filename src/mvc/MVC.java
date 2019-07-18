@@ -6,6 +6,9 @@
 package mvc;
 
 
+import Controladores.Singleton;
+import Controladores.Controlador1;
+import Controladores.Controlador2;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -15,7 +18,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import Vista.Escena1;
 import Vista.Vista;
-
 /**
  *
  * @author Estudiante
@@ -31,18 +33,14 @@ public class MVC extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Pane layout  = new Pane();  
-        Canvas canvas = new Canvas(1024,576);
-        layout.getChildren().add(canvas);
-        Scene escena = new Scene(layout,1024,576, Color.WHITESMOKE);
         
-        GraphicsContext lapiz = canvas.getGraphicsContext2D();
-        Escena1 juego = new Escena1(escena, lapiz);
-        juego.start();
-        
-        primaryStage.setScene(escena);
-        primaryStage.setTitle("Nivel 1 - Tutorial");
-        primaryStage.show();
+       Singleton singleton = Singleton.getSingleton();
+       singleton.setStage(primaryStage);
+       Controlador1 controlador = new Controlador1();
+       Scene escena = controlador.getVista().getScene();
+       primaryStage.setTitle("Escena 1");
+       primaryStage.setScene(escena);
+       primaryStage.show();
         
     }
     

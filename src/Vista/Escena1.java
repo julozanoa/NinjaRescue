@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package Vista;
+import Controladores.Controlador2;
+import Controladores.Singleton;
 import Modelos.*;
 import javafx.scene.Scene;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.Shape;
+import javafx.stage.Stage;
 /**
  *
  * @author usuario1
@@ -52,6 +55,7 @@ public class Escena1 extends AnimationTimer{
     private ArrayList<Shape> lateralesIzq;
     private ArrayList<Shape> lateralesDer;
     private ArrayList<Shape> obstaculos;
+    private boolean nivelSuperado;
     
     public Escena1(Scene escena, GraphicsContext lapiz) {
         this.lapiz = lapiz;
@@ -244,9 +248,7 @@ public class Escena1 extends AnimationTimer{
             contadorSalto = 20;
             saltando = true;
         }
-        System.out.println(this.chocandoTecho);
-        System.out.println(this.gravedad);
-        System.out.println(this.saltando);
+
         if (saltando && contadorSalto <= 20) {
             if (!chocandoTecho) {
                 ninja.moverArriba();
@@ -364,19 +366,41 @@ public class Escena1 extends AnimationTimer{
                   this.secuenciaF++;
                 }
           }
-
         
-        
-
+        if (pulsacionTeclado.contains("DOWN")) {
+            nivelSuperado = true;
+        }
+        System.out.println(nivelSuperado);
         this.gravedad = true;
         this.chocandoI = false;
         this.chocandoD = false;
         this.chocandoTecho = false;
+        
+        // 
         superficies = new ArrayList<>();
         techos = new ArrayList<>();
         lateralesIzq = new ArrayList<>();
         lateralesDer = new ArrayList<>();
         obstaculos = new ArrayList<>();
+        
+        if (nivelSuperado) {
+           Singleton singleton = Singleton.getSingleton();
+           Stage stage = singleton.getStage();
+           Controlador2 controlador = new Controlador2();
+           Scene escena = controlador.getVista().getScene();
+           stage.setScene(escena);
+           stop();
+        }
     }
+    
+    public Scene getScene() {
+       return this.escena;     
+    }
+
+    public boolean isNivelSuperado() {
+        return nivelSuperado;
+    }
+
+    
     
 }

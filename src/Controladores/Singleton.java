@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package controlador;
+package Controladores;
 
 import javafx.stage.Stage;
 
@@ -12,8 +12,7 @@ import javafx.stage.Stage;
  * @author Estudiante
  */
 public class Singleton {
-    private static Singleton 
-                     singleton;
+    private static Singleton singleton;
     private Stage stage;
 
     public Stage getStage() {
