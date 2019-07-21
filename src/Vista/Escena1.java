@@ -37,12 +37,16 @@ public class Escena1 extends AnimationTimer{
     private Image obstaculo1;
     private Image obstaculo2;
     private Image fuego;
+    private Image llave;
+    private Image puerta;
     private int secuencia = 0;
     private int secuenciaF = 0;
     private int numero ;
     private boolean UpIsPress = false;
     private boolean seMueveDerecha = false;
     private boolean seMueveIzquierda = false;
+    private boolean hayllave = true;
+    private boolean tienellave = false;
     private boolean gravedad;
     private boolean saltando;
     private boolean chocandoI;
@@ -67,6 +71,8 @@ public class Escena1 extends AnimationTimer{
         this.obstaculo1 = new Image( "Imagenes/Obstaculo1.png" );
         this.obstaculo2 = new Image( "Imagenes/Obstaculo3.png" );
         this.fuego = new Image( "Imagenes/fuego0.png" );
+        this.llave = new Image( "Imagenes/goldenkey.png");
+        this.puerta = new Image( "Imagenes/Door.png" );
         superficies = new ArrayList<>();
         techos = new ArrayList<>();
         lateralesIzq = new ArrayList<>();
@@ -77,6 +83,7 @@ public class Escena1 extends AnimationTimer{
         escena.setOnKeyPressed(new EventHandler<KeyEvent>(){
                 public void handle(KeyEvent e){
                     String code = e.getCode().toString();
+                    
                     if ( !pulsacionTeclado.contains(code) )
                         pulsacionTeclado.add( code );
                 }
@@ -112,6 +119,8 @@ public class Escena1 extends AnimationTimer{
         Shape paredD = new Rectangle(1024,0,40,576);
         Shape sParedD = SVGPath.intersect(sNinjaLateralI, paredD);
         lateralesDer.add(sParedD);
+        
+        
         //creando piso y registrando los pixeles
 
                //piso
@@ -119,19 +128,31 @@ public class Escena1 extends AnimationTimer{
         int x1 = 0;
         int y1 = 0;
         int y = 430;
+        int x2 = 0;
+        //puerta
+        lapiz.drawImage(puerta,0,10);
+        Shape puerta = new Rectangle(0,10,50,70);
+        Shape sPuerta = SVGPath.intersect(sNinja,puerta);
+        
+        //lave
+            Shape sllave = new Rectangle(964,30,40,20);
+            Shape sIntrsLlave = SVGPath.intersect(sNinja, sllave);
+        if (hayllave) {
+            lapiz.drawImage(llave,964,30);
+        }
+        
         lapiz.drawImage(obstaculo1,532,420);
         Shape techoBi = new Rectangle(532,419,40,4);
         Shape intrsPbi = SVGPath.intersect(sNinjaPiso, techoBi);
         superficies.add(intrsPbi);
-        Shape lateralBiD = new Rectangle(568,420,4,40);
+        Shape lateralBiD = new Rectangle(568,423,4,40);
         Shape intrsBiD = SVGPath.intersect(sNinjaLateralI, lateralBiD);
         lateralesIzq.add(intrsBiD);
-        Shape lateralBiI = new Rectangle(532,420,4,40);
+        Shape lateralBiI = new Rectangle(532,423,4,40);
         Shape intrsBiI = SVGPath.intersect(sNinjaLateralI, lateralBiI);
         lateralesDer.add(intrsBiI);
         
         //fuego
-        
         for (int i = 0; i < 5; i++) {
             lapiz.drawImage(fuego,y1+444,536);
             Shape fuego = new Rectangle(y1+444,536,40,40);
@@ -139,16 +160,56 @@ public class Escena1 extends AnimationTimer{
             obstaculos.add(obsFuego);
             y1 += 44;
         }
+        for (int i = 0; i < 2; i++) {
+            lapiz.drawImage(obstaculo1,x2+160,x2+160);
+            lapiz.drawImage(obstaculo1,532,420);
+              Shape techoBaP = new Rectangle(x2+160,x2+159,40,4);
+              Shape intrsBaP = SVGPath.intersect(sNinjaPiso, techoBaP);
+              superficies.add(intrsBaP);
+              Shape lateralDBaP = new Rectangle(x2+197,x2+163,4,40);
+              Shape intrsDBaP = SVGPath.intersect(sNinjaLateralI,lateralDBaP);
+              lateralesIzq.add(intrsDBaP);
+            x2 += 60;
+        }
         //piso inicio
         for (int i = 0; i < 4; i++) {
             
+            //piso a puerta
+               lapiz.drawImage(pisosprite,x1+280,280);
+               Shape techobp = new Rectangle(x1+280,280,40,4);
+               Shape intrsbp = SVGPath.intersect(sNinjaPiso, techobp);
+               superficies.add(intrsbp);
+               
+            if (i == 3) {
+               Shape lateralD = new Rectangle(x1+317,283,4,40);
+               Shape intrsD = SVGPath.intersect(sNinjaLateralI, lateralD);
+               lateralesIzq.add(intrsD);
+               
+               lapiz.drawImage(obstaculo2,x1+280,258);
+               Shape obst = new Rectangle(x1+280,258,40,22);
+               Shape intrsObst = SVGPath.intersect(sNinja, obst);
+               obstaculos.add(intrsObst);
+            }
+            if (i == 0) {
+               lapiz.drawImage(obstaculo2,x1+280,258);
+               lapiz.drawImage(obstaculo2,x1+280,258);
+               Shape obst = new Rectangle(x1+280,258,40,22);
+               Shape intrsObst = SVGPath.intersect(sNinja, obst);
+               obstaculos.add(intrsObst);
+            }
+               
             lapiz.drawImage(pisosprite,x1, 536);
             lapiz.drawImage(pisosprite,x1+280, 536);
+            
             //piso de la puerta
             lapiz.drawImage(pisosprite,x1,80);
-               Shape s1lT = new Rectangle(x1,121,40,4);
-               Shape intrsp = SVGPath.intersect(sNinjaTecho, s1lT);
-               techos.add(intrsp);
+               Shape s1lT = new Rectangle(x1,79,40,4);
+               Shape intrsp = SVGPath.intersect(sNinjaPiso, s1lT);
+               superficies.add(intrsp);
+               Shape s1lTD = new Rectangle(x1+37,82,4,40);
+               Shape intrspD = SVGPath.intersect(sNinjaLateralI, s1lTD);
+               lateralesIzq.add(intrspD);
+               
             //plataformas
                Shape techo = new Rectangle(x1,535,40,4);
                Shape intrsP = SVGPath.intersect(sNinjaPiso, techo);
@@ -156,30 +217,28 @@ public class Escena1 extends AnimationTimer{
                Shape techo2 = new Rectangle(x1+280,535,40,4);
                Shape intrsP1 = SVGPath.intersect(sNinjaPiso, techo2);
                superficies.add(intrsP1);
-            if (x1 == 120) {
-               Shape lateralD = new Rectangle(x1+37,536,4,40);
+            if (i == 2) {
+               Shape lateralD = new Rectangle(x1+37,538,4,40);
                Shape intrsD = SVGPath.intersect(sNinjaLateralI, lateralD);
                lateralesIzq.add(intrsD);
-               Shape lateralDp = new Rectangle(x1+37,80,4,40);
+               Shape lateralDp = new Rectangle(x1+37,82,4,40);
                Shape intrsDp = SVGPath.intersect(sNinjaLateralI, lateralDp);
-               lateralesIzq.add(intrsDp);
-               
+               lateralesIzq.add(intrsDp);   
             }
             if (x1+280 == 280) {
-               Shape lateralI = new Rectangle(x1+279,536,4,40);
+               Shape lateralI = new Rectangle(x1+279,539,4,40);
                Shape intrsI = SVGPath.intersect(sNinjaLateralD, lateralI);
                lateralesDer.add(intrsI);
             }
-            //barril inermedio
-            
             if (x1+280 == 400) {
                lapiz.drawImage(obstaculo1,x1+294,496);
                Shape techoB = new Rectangle(x1+294,495,40,4);
                Shape intrsB = SVGPath.intersect(sNinjaPiso, techoB);
                superficies.add(intrsB);
-               Shape lateralIB = new Rectangle(x1+299,497,4,40);
+               Shape lateralIB = new Rectangle(x1+299,499,4,40);
                Shape intrsIB = SVGPath.intersect(sNinjaLateralD, lateralIB);
                lateralesDer.add(intrsIB);
+               
                lapiz.drawImage(obstaculo2,x1+240,514);
                Shape obs = new Rectangle(x1+240,514,40,22);
                Shape intrsObs = SVGPath.intersect(sNinja, obs);
@@ -200,10 +259,20 @@ public class Escena1 extends AnimationTimer{
                superficies.add(intrsP);
             //piso llave
             lapiz.drawImage(pisosprite,x1+504, 80);
-            Shape s1lT = new Rectangle(x1+504,121,40,4);
+               Shape s1lT = new Rectangle(x1+504,121,40,4);
                Shape intrsp = SVGPath.intersect(sNinjaTecho, s1lT);
                techos.add(intrsp);
+               Shape s1lTp = new Rectangle(x1+504,79,40,4);
+               Shape intrspp = SVGPath.intersect(sNinjaPiso, s1lTp);
+               superficies.add(intrspp);
+               
             if (i == 0) {
+               //lateral piso llave
+               Shape lateralI = new Rectangle(x1+504,83,4,40);
+               Shape intrsI = SVGPath.intersect(sNinjaLateralD, lateralI);
+               lateralesDer.add(intrsI);
+               
+               //
                lapiz.drawImage(obstaculo1,x1+490,496);
                Shape techoB = new Rectangle(x1+490,495,40,4);
                Shape intrsB = SVGPath.intersect(sNinjaPiso, techoB);
@@ -229,7 +298,7 @@ public class Escena1 extends AnimationTimer{
                     lateralesIzq.add(intrsDp);
                     if (j == 2) {
                         lapiz.drawImage(obstaculo1,984,y-20);
-                        Shape lateralIb = new Rectangle(990,y-20,4,40);
+                        Shape lateralIb = new Rectangle(990,y-17,4,40);
                         Shape intrsIb = SVGPath.intersect(sNinjaLateralD, lateralIb);
                         lateralesDer.add(intrsIb);
                         Shape techoB = new Rectangle(990,y-21,40,4);
@@ -241,6 +310,26 @@ public class Escena1 extends AnimationTimer{
                         Shape obs = new Rectangle(x1+490,y-22,40,22);
                         Shape intrsObs = SVGPath.intersect(sNinja, obs);
                         obstaculos.add(intrsObs);
+                        
+                        //piso antes de llave
+                        
+                        lapiz.drawImage(pisosprite,x1+370,y);
+                        Shape techoB = new Rectangle(x1+370,y,40,2);
+                        Shape intrsB = SVGPath.intersect(sNinjaPiso, techoB);
+                        superficies.add(intrsB);
+                        Shape ladoIB = new Rectangle(x1+369,y+3,4,40);
+                        Shape intrsIB = SVGPath.intersect(sNinjaLateralD, ladoIB);
+                        lateralesDer.add(intrsIB);
+                        
+                        lapiz.drawImage(pisosprite,x1+410,y);
+                        Shape techoB0 = new Rectangle(x1+410,y,40,2);
+                        Shape intrsB0 = SVGPath.intersect(sNinjaPiso, techoB0);
+                        superficies.add(intrsB0);
+                        Shape ladoDB = new Rectangle(x1+437,y+3,4,40);
+                        Shape intrsDB = SVGPath.intersect(sNinjaLateralD, ladoDB);
+                        lateralesIzq.add(intrsDB);
+                        
+                        
                     }
                     y -= 40;
                 }
@@ -254,14 +343,15 @@ public class Escena1 extends AnimationTimer{
                 Shape intrsS = SVGPath.intersect(sNinjaTecho, s);
                 techos.add(intrsS);
                 if (i == 6) {
-                  Shape lateralDp = new Rectangle(x1+527,431,2,40);
+                  Shape lateralDp = new Rectangle(x1+527,433,2,40);
                   Shape intrsDp = SVGPath.intersect(sNinjaLateralI, lateralDp);
                   lateralesIzq.add(intrsDp);
                   
-                  Shape lateralDp1 = new Rectangle(x1+527,231,2,40);
+                  Shape lateralDp1 = new Rectangle(x1+527,233,2,40);
                   Shape intrsDp1 = SVGPath.intersect(sNinjaLateralI, lateralDp1);
                   lateralesIzq.add(intrsDp1);
                 }
+                
                 lapiz.drawImage(pisosprite,x1+490,230);
                 Shape techoB1 = new Rectangle(x1+490,229,39,4);
                 Shape intrsB1 = SVGPath.intersect(sNinjaPiso, techoB1);
@@ -269,9 +359,28 @@ public class Escena1 extends AnimationTimer{
                 Shape s1 = new Rectangle(x1+490,266,40,5);
                 Shape intrsS1 = SVGPath.intersect(sNinjaTecho, s1);
                 techos.add(intrsS1);
+                
             }
             
             x1 += 40;
+        }
+        
+        for (int i = 0; i < 4; i++) {
+            lapiz.drawImage(pisosprite,x1+10,y-40);
+            Shape techoB1 = new Rectangle(x1+10,y-41,40,4);
+            Shape intrsB1 = SVGPath.intersect(sNinjaPiso, techoB1);
+            superficies.add(intrsB1);
+            if (i == 0) {
+                  Shape lateralDp1 = new Rectangle(x1+48,y-37,3,40);
+                  Shape intrsDp1 = SVGPath.intersect(sNinjaLateralI, lateralDp1);
+                  lateralesIzq.add(intrsDp1);
+            }
+            if (i == 3) {
+                  Shape ladoIB = new Rectangle(x1+10,y-37,3,40);
+                  Shape intrsIB = SVGPath.intersect(sNinjaLateralD, ladoIB);
+                  lateralesDer.add(intrsIB);
+            }
+            x1 -= 40;
         }
         //Validando si el ninja esta en el piso
         for (int i = 0; i < superficies.size(); i++) {
@@ -292,12 +401,17 @@ public class Escena1 extends AnimationTimer{
             }
         }
         
+        //validando si tiene la llava
+        if (sIntrsLlave.getBoundsInLocal().getWidth() != -1) {
+            hayllave = false;
+            tienellave = true;
+        }
         //Validando si se ha chocado con algun obstaculo
         for (int i = 0; i < obstaculos.size(); i++) {
             if ((obstaculos.get(i).getBoundsInLocal().getWidth()) != -1) {
                 ninja.setXref(2);
                 ninja.setYref(470);
-                break;
+                
             }
         }
         for (int i = 0; i < techos.size(); i++) {
@@ -430,11 +544,10 @@ public class Escena1 extends AnimationTimer{
           }
 
         
-        if (pulsacionTeclado.contains("DOWN")) {
+        if (sPuerta.getBoundsInLocal().getWidth() != -1 && tienellave) {
             nivelSuperado = true;
         }
-        System.out.println("g"+gravedad);
-        System.out.println(chocandoI);
+
         this.gravedad = true;
         this.chocandoI = false;
         this.chocandoD = false;
@@ -455,6 +568,7 @@ public class Escena1 extends AnimationTimer{
            stage.setScene(escena);
            stop();
         }
+        
     }
     
     public Scene getScene() {

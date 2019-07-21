@@ -17,7 +17,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import Vista.Escena1;
-import Vista.Vista;
 /**
  *
  * @author Estudiante
