@@ -9,6 +9,7 @@ package mvc;
 import Controladores.Singleton;
 import Controladores.Controlador1;
 import Controladores.Controlador2;
+import Controladores.Controlador3;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -35,7 +36,7 @@ public class MVC extends Application{
         
        Singleton singleton = Singleton.getSingleton();
        singleton.setStage(primaryStage);
-       Controlador1 controlador = new Controlador1();
+       Controlador3 controlador = new Controlador3();
        Scene escena = controlador.getVista().getScene();
        primaryStage.setTitle("Escena 1");
        primaryStage.setScene(escena);

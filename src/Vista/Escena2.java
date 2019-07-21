@@ -23,13 +23,15 @@ public class Escena2 extends AnimationTimer{
     private GraphicsContext lapiz;
     private Image ninja;
     private Image fondo;
+    private int secuencia = 0;
+    private int secuenciaFondo = 0;
     private ArrayList<String> pulsacionTeclado = null;
 
     public Escena2(Scene escena, GraphicsContext lapiz) {
         this.escena = escena;
         this.lapiz = lapiz;
         this.ninja = new Image( "Imagenes/Ninja(0).png" );
-        this.fondo = new Image( "Imagenes/fondojuego2.png" );
+        this.fondo = new Image( "Imagenes/fondoPInicio.png" );
         pulsacionTeclado = new ArrayList<>();
         
         escena.setOnKeyPressed(
@@ -57,8 +59,12 @@ public class Escena2 extends AnimationTimer{
     
     @Override
     public void handle(long now) {
-        lapiz.drawImage(this.fondo, 0, 0);
+        lapiz.drawImage(this.fondo,secuenciaFondo, 0);
         
+        secuencia++;
+        if (secuencia %3 == 0) {
+            secuenciaFondo--;
+        }
     }
     
     public Scene getScene() {
