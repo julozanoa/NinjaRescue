@@ -102,6 +102,7 @@ public class Escena1 extends AnimationTimer{
 
         lapiz.clearRect(0, 0, 1024, 576);
         lapiz.drawImage(this.fondo, 0, 0);
+        lapiz.drawImage(puerta,0,10);
         
         //Dibujando sprite del ninja
         lapiz.drawImage(ninjasprite,ninja.getXref(),ninja.getYref());
@@ -130,7 +131,7 @@ public class Escena1 extends AnimationTimer{
         int y = 430;
         int x2 = 0;
         //puerta
-        lapiz.drawImage(puerta,0,10);
+        
         Shape puerta = new Rectangle(0,10,50,70);
         Shape sPuerta = SVGPath.intersect(sNinja,puerta);
         
@@ -560,7 +561,7 @@ public class Escena1 extends AnimationTimer{
         lateralesDer = new ArrayList<>();
         obstaculos = new ArrayList<>();
         
-        if (nivelSuperado) {
+        if (nivelSuperado && pulsacionTeclado.contains("DOWN")) {
            Singleton singleton = Singleton.getSingleton();
            Stage stage = singleton.getStage();
            Controlador2 controlador = new Controlador2();
