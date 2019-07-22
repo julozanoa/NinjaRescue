@@ -5,6 +5,9 @@
  */
 package Vista;
 import Controladores.Controlador2;
+import Controladores.Controlador3;
+import Controladores.Controlador4;
+import Controladores.Controlador6;
 import Controladores.Singleton;
 import Modelos.*;
 import javafx.scene.Scene;
@@ -23,14 +26,11 @@ import javafx.stage.Stage;
  *
  * @author usuario1
  */
-public class Escena1 extends AnimationTimer{
+public class Nivel1 extends AnimationTimer{
 
     private Scene escena;
     private GraphicsContext lapiz;
     private Ninja ninja;
-    private NinjaMalo ninjamalo;
-    private Plataforma1 piso;
-    private Plataforma2 plataforma;
     private Image fondo ;   
     private Image ninjasprite;
     private Image pisosprite;
@@ -61,10 +61,10 @@ public class Escena1 extends AnimationTimer{
     private ArrayList<Shape> obstaculos;
     private boolean nivelSuperado;
     
-    public Escena1(Scene escena, GraphicsContext lapiz) {
+    public Nivel1(Scene escena, GraphicsContext lapiz) {
         this.lapiz = lapiz;
         this.escena = escena;
-        this.ninja = new Ninja(800,475, 40, 60);
+        this.ninja = new Ninja(2,475, 40, 60);
         this.fondo = new Image( "Imagenes/fondojuego3.png" );
         this.pisosprite = new Image( "Imagenes/Plataforma1.png" );
         this.ninjasprite = new Image( "Imagenes/Ninja(0).png" );
@@ -561,12 +561,13 @@ public class Escena1 extends AnimationTimer{
         lateralesDer = new ArrayList<>();
         obstaculos = new ArrayList<>();
         
-        if (nivelSuperado && pulsacionTeclado.contains("DOWN")) {
+        if ( nivelSuperado && pulsacionTeclado.contains("SPACE")) {
            Singleton singleton = Singleton.getSingleton();
            Stage stage = singleton.getStage();
-           Controlador2 controlador = new Controlador2();
+           Controlador6 controlador = new Controlador6();
            Scene escena = controlador.getVista().getScene();
            stage.setScene(escena);
+           stage.setTitle("NuevoTutorial");
            stop();
         }
         

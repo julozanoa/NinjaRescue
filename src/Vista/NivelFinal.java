@@ -6,6 +6,8 @@
 package Vista;
 
 import Controladores.Controlador2;
+import Controladores.Controlador4;
+import Controladores.Controlador5;
 import Controladores.Singleton;
 import Modelos.*;
 import javafx.scene.Scene;
@@ -20,11 +22,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
+import Modelos.Proyectil;
 /**
  *
  * @author usuario1
  */
-public class Escena3 extends AnimationTimer{
+public class NivelFinal extends AnimationTimer{
 
     private Scene escena;
     private GraphicsContext lapiz;
@@ -36,13 +39,22 @@ public class Escena3 extends AnimationTimer{
     private Image fuego;
     private Image llave;
     private Image puerta; 
+    private Image princesa;
+    private Image ninjaMaloSprite;
+    private Image proyectil;
+    private Image proyectilI;
+    private Image proyectilD;
     private Ninja ninja;
+    private Ninja ninjaMalo;
     private ArrayList<String> pulsacionTeclado = null;
     private ArrayList<Shape> superficies;
     private ArrayList<Shape> techos;
     private ArrayList<Shape> lateralesIzq;
     private ArrayList<Shape> lateralesDer;
     private ArrayList<Shape> obstaculos;
+    private ArrayList<Proyectil> pMalos;
+    private ArrayList<Proyectil> pBuenosI;
+    private ArrayList<Proyectil> pBuenosD;
     private boolean UpIsPress = false;
     private boolean seMueveDerecha = false;
     private boolean seMueveIzquierda = false;
@@ -53,12 +65,22 @@ public class Escena3 extends AnimationTimer{
     private boolean chocandoI;
     private boolean chocandoD;
     private boolean chocandoTecho;
+    private boolean disparo;
+    private boolean izquierda;
+    private boolean derecha;
+    private boolean disparando;
+    private boolean boss = true;
+    private boolean tllave = false;
+    private boolean tieneLlave = false;
+    private boolean ePuerta = true;
     private int secuencia = 0;
     private int secuenciaF = 0;
+    private int secuenciaNm = 0;
     private int numero ;
     private int contadorSalto = 0;
+    private int contadorDisparo = 0;
 
-    public Escena3(Scene escena, GraphicsContext lapiz) {
+    public NivelFinal(Scene escena, GraphicsContext lapiz) {
         this.escena = escena;
         this.lapiz = lapiz;
         this.fondo = new Image( "Imagenes/fondojuego2.png" );
@@ -68,15 +90,23 @@ public class Escena3 extends AnimationTimer{
         this.obstaculo2 = new Image( "Imagenes/Obstaculo3.png" );
         this.fuego = new Image( "Imagenes/fuego0.png" );
         this.llave = new Image( "Imagenes/goldenkey.png");
-        this.puerta = new Image( "Imagenes/Door.png" );
+        this.puerta = new Image( "Imagenes/Door2.png" );
+        this.princesa = new Image( "Imagenes/princesa.png" );
+        this.ninjaMaloSprite = new Image( "Imagenes/Boss(0).png" );
+        this.proyectil = new Image ( "Imagenes/proyectil.png" );
+        this.proyectilI = new Image ( "Imagenes/proyectilNinjaI.png" );
+        this.proyectilD = new Image ( "Imagenes/proyectilNinjaD.png" );
         this.ninja = new Ninja(0,472,40,60);
+        this.ninjaMalo = new Ninja(944,395,80,61);
         pulsacionTeclado = new ArrayList<>();
         superficies = new ArrayList<>();
         techos = new ArrayList<>();
         lateralesIzq = new ArrayList<>();
         lateralesDer = new ArrayList<>();
         obstaculos = new ArrayList<>();
-        
+        pMalos = new ArrayList<>();
+        pBuenosI = new ArrayList<>();
+        pBuenosD = new ArrayList<>();
         escena.setOnKeyPressed(
             new EventHandler<KeyEvent>()
             {
@@ -104,6 +134,14 @@ public class Escena3 extends AnimationTimer{
     @Override
     public void handle(long now) {
         lapiz.drawImage(fondo,0,0);
+        
+        lapiz.drawImage(pisosprite,944,33);    
+        lapiz.drawImage(pisosprite,984,33);
+        if (ePuerta) {
+        lapiz.drawImage(puerta,944,65);
+        }
+        //princesa
+        lapiz.drawImage(princesa,984,96);
         //ninja
         lapiz.drawImage(spriteNinja,ninja.getXref(),ninja.getYref());
         Shape sNinja = new Rectangle(ninja.getXref()+10, ninja.getYref(), ninja.getAncho()-20, ninja.getAlto());
@@ -111,6 +149,47 @@ public class Escena3 extends AnimationTimer{
         Shape sNinjaLateralI = new Rectangle(ninja.getXref()-1,ninja.getYref(),40,60);
         Shape sNinjaLateralD = new Rectangle(ninja.getXref()+1,ninja.getYref(),40,60);
         Shape sNinjaTecho = new Rectangle(ninja.getXref(),ninja.getYref()-1,40,3);
+        
+        Shape sPrin = new Rectangle(984,96,40,60);
+        Shape win = SVGPath.intersect(sNinja,sPrin);
+        
+        if (boss) {
+        lapiz.drawImage(ninjaMaloSprite,ninjaMalo.getXref(),ninjaMalo.getYref());
+        }
+        if (tllave) {
+        lapiz.drawImage(llave,964,395);
+        }
+        Shape ll = new Rectangle(964,395,40,30);
+        Shape sLl = SVGPath.intersect(sNinja, ll);
+        
+        if (sLl.getBoundsInLocal().getWidth() != -1) {
+            tllave = false;
+            tieneLlave = true;
+        }
+        Shape nM = new Rectangle(964,395,80,61);
+        
+        //hitbox puerta
+        Shape dR = new Rectangle(944,65,40,91);
+        Shape sDr = SVGPath.intersect(sNinja,dR);
+        if (sDr.getBoundsInLocal().getWidth() != -1 && !tieneLlave) {
+            ninja.setXref(0);
+            ninja.setYref(472);
+        }
+        if (sDr.getBoundsInLocal().getWidth() != -1 && tieneLlave) {
+            ePuerta = false;
+        }
+        
+        
+        Shape t = new Rectangle(944,36,3,38);
+        Shape st = SVGPath.intersect(sNinjaLateralI, t);
+        lateralesDer.add(st);
+       
+        Shape d0 = new Rectangle(944,70,40,4);
+        Shape sD0 = SVGPath.intersect(sNinjaTecho, d0);
+        techos.add(sD0);
+        Shape t00 = new Rectangle(984,70,40,4);
+        Shape st00 = SVGPath.intersect(sNinjaTecho,t00);
+        techos.add(st00);
         
         //laterales mapa
         Shape paredI = new Rectangle(-39,0,40,576);
@@ -121,8 +200,58 @@ public class Escena3 extends AnimationTimer{
         lateralesDer.add(sParedD);
         
         int x = 0;
+        int y0 = 496;
         int y1 = 356;
         for (int i = 0; i < 25; i++) {
+            int c = 0;
+            for (int j = 0; j < 4; j++) {
+                if (j == 0) {
+                    lapiz.drawImage(obstaculo1,744+c,196);
+                    Shape p1 = new Rectangle(744+c,195,40,4);
+                    Shape sP1 = SVGPath.intersect(sNinjaPiso, p1);
+                    superficies.add(sP1);
+                    Shape pD = new Rectangle((744+c)+38,199,3,37);
+                    Shape sD = SVGPath.intersect(sNinjaLateralI, pD);
+                    lateralesIzq.add(sD);
+                    lapiz.drawImage(obstaculo2,744+c,184);
+                    Shape pin = new Rectangle(744+c,184,40,22);
+                    Shape sPin = SVGPath.intersect(sNinja, pin);
+                    obstaculos.add(sPin);
+                }
+                if (j == 1 || j == 2) {
+                    lapiz.drawImage(pisosprite,784+c,236);
+                    Shape p1 = new Rectangle(784+c,235,40,4);
+                    Shape sP1 = SVGPath.intersect(sNinjaPiso, p1);
+                    superficies.add(sP1);
+                    
+                    lapiz.drawImage(pisosprite,944+c,156);
+                    Shape p10 = new Rectangle(944+c,156,40,4);
+                    Shape sP10 = SVGPath.intersect(sNinjaPiso, p10);
+                    superficies.add(sP10);
+                    Shape pD10 = new Rectangle(943+c,159,3,37);
+                    Shape sD10 = SVGPath.intersect(sNinjaLateralI, pD10);
+                    lateralesDer.add(sD10);
+                    
+                    lapiz.drawImage(pisosprite,944+c,456);
+                    Shape p100 = new Rectangle(944+c,456,40,4);
+                    Shape sP100 = SVGPath.intersect(sNinjaPiso, p100);
+                    superficies.add(sP100);
+                    Shape pD100 = new Rectangle(943+c,459,3,37);
+                    Shape sD100 = SVGPath.intersect(sNinjaLateralI, pD100);
+                    lateralesDer.add(sD100);
+                    c+=40;
+                    
+                }
+                if (j == 3) {
+                    lapiz.drawImage(obstaculo1,784+c,196);
+                    Shape p1 = new Rectangle(784+c,195,40,4);
+                    Shape sP1 = SVGPath.intersect(sNinjaPiso, p1);
+                    superficies.add(sP1);
+                    Shape pD10 = new Rectangle(783+c,199,3,37);
+                    Shape sD10 = SVGPath.intersect(sNinjaLateralI, pD10);
+                    lateralesDer.add(sD10);
+                }
+            }
             if (i == 0) {
                 lapiz.drawImage(pisosprite,x,536);
                 Shape p = new Rectangle(x,535,40,4);
@@ -136,6 +265,10 @@ public class Escena3 extends AnimationTimer{
                 Shape pt = new Rectangle(x,393,40,3);
                 Shape sPt = SVGPath.intersect(sNinjaTecho, pt);
                 techos.add(sPt);
+                lapiz.drawImage(obstaculo2,x,334);
+                Shape pin = new Rectangle(x,334,40,22);
+                Shape sPin = SVGPath.intersect(sNinja, pin);
+                obstaculos.add(sPin);
                 
                 lapiz.drawImage(pisosprite,x,186);
                 Shape p2 = new Rectangle(x,345,40,4);
@@ -144,6 +277,10 @@ public class Escena3 extends AnimationTimer{
                 Shape pt2 = new Rectangle(x,223,40,4);
                 Shape sPt2 = SVGPath.intersect(sNinjaTecho, pt2);
                 techos.add(sPt2);
+                lapiz.drawImage(obstaculo2,x,164);
+                Shape pin1 = new Rectangle(x,164,40,22);
+                Shape sPin1 = SVGPath.intersect(sNinja, pin1);
+                obstaculos.add(sPin1);
             }
             if (i == 1) {
                 lapiz.drawImage(pisosprite,x,536);
@@ -233,16 +370,86 @@ public class Escena3 extends AnimationTimer{
                     y1-=40;
                 }
             }
+            if (i == 5) {
+                lapiz.drawImage(obstaculo2,x,334);
+                Shape pin = new Rectangle(x,334,40,22);
+                Shape sPin = SVGPath.intersect(sNinja, pin);
+                obstaculos.add(sPin);
+                lapiz.drawImage(obstaculo2,x,134);
+                Shape pin1 = new Rectangle(x,134,40,22);
+                Shape sPin1 = SVGPath.intersect(sNinja, pin1);
+                obstaculos.add(sPin1);
+            }
             if (i == 5 || i == 6) {
                 lapiz.drawImage(pisosprite,x,356);
                 Shape p = new Rectangle(x,355,40,4);
                 Shape sP = SVGPath.intersect(sNinjaPiso, p);
                 superficies.add(sP);
+                Shape pI2 = new Rectangle(x+38,359,3,37);
+                Shape sI2 = SVGPath.intersect(sNinjaLateralI, pI2);
+                lateralesIzq.add(sI2);
                 
                 lapiz.drawImage(pisosprite,x,156);
                 Shape p1 = new Rectangle(x,155,40,4);
                 Shape sP1 = SVGPath.intersect(sNinjaPiso, p1);
                 superficies.add(sP1);
+                Shape pI2d = new Rectangle(x+38,159,3,37);
+                Shape sI2d = SVGPath.intersect(sNinjaLateralI, pI2d);
+                lateralesIzq.add(sI2d);
+            }
+            if (i == 9) {
+                int a = 0;
+                lapiz.drawImage(obstaculo2,x+a+40,231);
+                Shape pin1 = new Rectangle(x+a+40,231,40,22);
+                Shape sPin1 = SVGPath.intersect(sNinja, pin1);
+                obstaculos.add(sPin1);
+                lapiz.drawImage(obstaculo2,x+a+40,434);
+                Shape pin10 = new Rectangle(x+a+40,434,40,22);
+                Shape sPin10 = SVGPath.intersect(sNinja, pin10);
+                obstaculos.add(sPin10);
+                lapiz.drawImage(obstaculo2,x+a+240,434);
+                Shape pin101 = new Rectangle(x+a+240,434,40,22);
+                Shape sPin101 = SVGPath.intersect(sNinja, pin101);
+                obstaculos.add(sPin101);
+                lapiz.drawImage(obstaculo2,x+a+400,434);
+                Shape pin1010 = new Rectangle(x+a+400,434,40,22);
+                Shape sPin1010 = SVGPath.intersect(sNinja, pin1010);
+                obstaculos.add(sPin1010);
+                for (int j = 0; j < 3; j++) {
+                lapiz.drawImage(pisosprite,x+a,253);
+                Shape p1 = new Rectangle(x+a,252,40,4);
+                Shape sP1 = SVGPath.intersect(sNinjaPiso, p1);
+                superficies.add(sP1);
+                    if (j == 0) {
+                        Shape pD2 = new Rectangle((x+a)-1,257,3,37);
+                        Shape sD2 = SVGPath.intersect(sNinjaLateralD, pD2);
+                        lateralesDer.add(sD2);
+                    }
+                    if (j == 2) {
+                        Shape pI2 = new Rectangle((x+a)+38,256,3,37);
+                        Shape sI2 = SVGPath.intersect(sNinjaLateralI, pI2);
+                        lateralesIzq.add(sI2);
+                    }
+                a += 40;
+                }
+            }
+            if (i >= 13 && i <= 17) {
+                int b = 0;
+                lapiz.drawImage(pisosprite,x+b,156);
+                Shape p1 = new Rectangle(x+b,155,40,4);
+                Shape sP1 = SVGPath.intersect(sNinjaPiso, p1);
+                superficies.add(sP1);
+                if (i == 13) {
+                    Shape pD2 = new Rectangle((x+b)-1,160,3,37);
+                    Shape sD2 = SVGPath.intersect(sNinjaLateralD, pD2);
+                    lateralesDer.add(sD2);
+                }
+                if (i == 17) {
+                    Shape pI2 = new Rectangle((x+b)+38,160,3,37);
+                    Shape sI2 = SVGPath.intersect(sNinjaLateralI, pI2);
+                    lateralesIzq.add(sI2);
+                }
+                b+=40;
             }
             if (i >= 4 && i <= 25) {
                 lapiz.drawImage(fuego,x+10,536);
@@ -269,7 +476,6 @@ public class Escena3 extends AnimationTimer{
             }
             x+=40;
         }
-        
         //Validando si el ninja esta en el piso
         for (int i = 0; i < superficies.size(); i++) {
             if ((superficies.get(i).getBoundsInLocal().getWidth()) != -1) {
@@ -306,6 +512,7 @@ public class Escena3 extends AnimationTimer{
                 ninja.moverArriba();
                 ninja.moverArriba();
                 ninja.moverArriba();
+            }else{
             }
                 contadorSalto--;
                 if (contadorSalto == 0) {
@@ -333,16 +540,10 @@ public class Escena3 extends AnimationTimer{
             this.seMueveDerecha = true;
         }
 
-        //Validando si se ha chocado con algun obstaculo
-        for (int i = 0; i < obstaculos.size(); i++) {
-            if ((obstaculos.get(i).getBoundsInLocal().getWidth()) != -1) {
-                ninja.setXref(0);
-                ninja.setYref(472);
-                
-            }
-        }
         
         if(this.numero % 9 == 0  && this.seMueveDerecha ){
+            derecha = true;
+            izquierda = false;
                 if(this.secuencia == 9){
                   this.secuencia = 0;
                 }else{
@@ -369,11 +570,12 @@ public class Escena3 extends AnimationTimer{
                     }
                     
                   this.secuencia++;
-                  this.seMueveDerecha = false;
                 }
           }
         
         if(this.numero % 9 == 0 && this.seMueveIzquierda){
+            derecha = false;
+            izquierda = true;
                 if(this.secuencia == 9){
                   this.secuencia = 0;
                 }else{
@@ -400,10 +602,10 @@ public class Escena3 extends AnimationTimer{
                     }
                     
                   this.secuencia++;
-                  this.seMueveIzquierda = false;
                 }
           }
-        if(this.numero % 17 == 0){
+        
+            if(this.numero % 17 == 0){
                 if(this.secuenciaF == 17){
                   this.secuenciaF = 0;
                 }else{
@@ -424,6 +626,108 @@ public class Escena3 extends AnimationTimer{
                   this.secuenciaF++;
                 }
          }
+        
+        if(this.numero % 49 == 0){
+                if(this.secuenciaNm == 49){
+                  this.secuenciaNm = 0;
+                }else{
+                    if (this.secuenciaNm >= 0 && this.secuenciaNm <= 4) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(0).png" ); 
+                    }else if (this.secuenciaNm >= 5 && this.secuenciaNm <= 9) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(1).png" ); 
+                    }else if (this.secuenciaNm >= 10 && this.secuenciaNm <= 14) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(2).png" ); 
+                    }else if (this.secuenciaNm >= 15 && this.secuenciaNm <= 19) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(3).png" ); 
+                    }else if (this.secuenciaNm >= 20 && this.secuenciaNm <= 24) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(4).png" ); 
+                    }else if (this.secuenciaNm >= 25 && this.secuenciaNm <= 29) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(5).png" ); 
+                    }else if (this.secuenciaNm >= 30 && this.secuenciaNm <= 34) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(6).png" ); 
+                    }else if (this.secuenciaNm >= 35 && this.secuenciaNm <= 39) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(7).png" );
+                        if (boss) {
+                        Proyectil p = new Proyectil(924,415,20,20);
+                        pMalos.add(p);
+                        }
+                    }else if (this.secuenciaNm >= 40 && this.secuenciaNm <= 44) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(8).png" ); 
+                    }else if (this.secuenciaNm >= 45 && this.secuenciaNm <= 49) {
+                        this.ninjaMaloSprite = new Image( "Imagenes/Boss(9).png" ); 
+                    }
+                  this.secuenciaNm++;
+                }
+          }
+        for (int i = 0; i < pMalos.size(); i++) {
+            lapiz.drawImage(proyectil,pMalos.get(i).getXref(),pMalos.get(i).getYref());
+            Shape p = new Rectangle(pMalos.get(i).getXref(),pMalos.get(i).getYref(),20,20);
+            Shape p0 = SVGPath.intersect(sNinja,p);
+            obstaculos.add(p0);
+        }
+        
+        //Validando si se ha chocado con algun obstaculo
+        for (int i = 0; i < obstaculos.size(); i++) {
+            if ((obstaculos.get(i).getBoundsInLocal().getWidth()) != -1) {
+                ninja.setXref(0);
+                ninja.setYref(472);
+                
+            }
+        }
+        for (int i = 0; i < pMalos.size(); i++) {
+            pMalos.get(i).moverIzquierda(15);
+        }
+        if (pulsacionTeclado.contains("SPACE") && izquierda && !disparando) {
+            Proyectil p = new Proyectil(ninja.getXref()-20,ninja.getYref()+30,20,20);
+            pBuenosI.add(p);
+            contadorDisparo = 20;
+            disparando = true;
+        }
+        if (pulsacionTeclado.contains("SPACE") && derecha && !disparando) {
+            Proyectil p = new Proyectil(ninja.getXref()+40,ninja.getYref()+30,20,20);
+            pBuenosD.add(p);
+            contadorDisparo = 20;
+            disparando = true;
+        }
+        Shape z = null;
+        if (disparando && contadorDisparo <= 20) {
+            for (int i = 0; i < pBuenosI.size(); i++) {
+            lapiz.drawImage(proyectilI,pBuenosI.get(i).getXref(),pBuenosI.get(i).getYref());
+            Shape pi = new Rectangle(pBuenosI.get(i).getXref(),pBuenosI.get(i).getYref(),20,20);
+            Shape snM = SVGPath.intersect(nM, pi);
+            z = snM;
+            pBuenosI.get(i).moverIzquierda(15);
+            }
+            for (int i = 0; i < pBuenosD.size(); i++) {
+            lapiz.drawImage(proyectilD,pBuenosD.get(i).getXref(),pBuenosD.get(i).getYref());
+            Shape pi = new Rectangle(pBuenosD.get(i).getXref(),pBuenosD.get(i).getYref(),20,20);
+            Shape snM = SVGPath.intersect(nM, pi);
+            z = snM;
+            pBuenosD.get(i).moverDerecha(15);
+            }
+            contadorDisparo--;
+            
+            if (contadorDisparo == 0) {
+                disparando = false;
+            }
+        }
+        if (z != null && z.getBoundsInLocal().getWidth() != -1) {
+            boss = false;
+            tllave = true;
+        }
+        
+        if (win.getBoundsInLocal().getWidth() != -1 && pulsacionTeclado.contains("SPACE")) {
+           Singleton singleton = Singleton.getSingleton();
+           Stage stage = singleton.getStage();
+           Controlador5 controlador = new Controlador5();
+           Scene escena = controlador.getVista().getScene();
+           stage.setScene(escena);
+           stage.setTitle("Final");
+           stop();
+        }
+        this.seMueveDerecha = false;
+        this.seMueveIzquierda = false;
+        
         this.gravedad = true;
         this.chocandoI = false;
         this.chocandoD = false;
@@ -435,6 +739,10 @@ public class Escena3 extends AnimationTimer{
         lateralesIzq = new ArrayList<>();
         lateralesDer = new ArrayList<>();
         obstaculos = new ArrayList<>();
+        if (!disparando) {
+            pBuenosI = new ArrayList<>();
+            pBuenosD = new ArrayList<>();
+        }
     }
     
     public Scene getScene() {

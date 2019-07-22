@@ -5,8 +5,7 @@
  */
 package Controladores;
 
-import Vista.Escena1;
-import Vista.Escena2;
+import Vista.Tutorial;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -18,7 +17,7 @@ import javafx.scene.paint.Color;
  * @author JUANPABLO
  */
 public class Controlador2 {
-    private Escena2 vista;
+    private Tutorial vista;
     private Pane layout;
     private Canvas canvas;
     private Scene escena;
@@ -30,15 +29,15 @@ public class Controlador2 {
       this.escena = new Scene(this.layout,1024,576, Color.WHITESMOKE);
       this.lapiz = this.canvas.getGraphicsContext2D();
       this.layout.getChildren().add(this.canvas);
-      this.vista = new Escena2(this.escena,this.lapiz);
+      this.vista = new Tutorial(this.escena,this.lapiz);
       this.vista.start();
     }
     
-    public Escena2 getVista() {
+    public Tutorial getVista() {
         return vista;
     }
 
-    public void setVista(Escena2 vista) {
+    public void setVista(Tutorial vista) {
         this.vista = vista;
     }
 }
